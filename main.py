@@ -13,14 +13,19 @@ from tkinter import ttk
 
 class app:
     def __init__(self, master):
-
+        username_windows = os.environ.get( "USERNAME" )
+        directory = rf'C:\Users\{username_windows}\.python_project_priv_key'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
         self.master = master
         self.master.geometry("1200x600")
-        self.HOST = '127.0.0.1'
+        self.HOST = 'messagerie-python.ydns.eu'
+        
         self.PORT = 9090
 
         self.login()
-    
+ 
+
     def login(self):
         for i in self.master.winfo_children():
             i.destroy()
@@ -86,7 +91,7 @@ class app:
         self.acct_alerte.configure(state=tkinter.DISABLED)
         self.loginuser = self.login_user.get().strip()
         self.password1 = self.password_1.get().strip()
-    
+        print(self.loginuser, f"pass:{self.password1}-")
         
         self.password2 = self.password_2.get().strip()
         
@@ -114,10 +119,12 @@ class app:
             null = (self.sock.recv(1024)).decode('utf-8')
             self.sock.send(self.password1.encode('utf-8'))
             cnn = (self.sock.recv(1024)).decode('utf-8')
-      
             if cnn == "nop":
+                self.sock.send("new_user".encode('utf-8'))
+                null = (self.sock.recv(1024)).decode('utf-8')
                 key = create_key(self.loginuser)
-              
+
+                print(key)
                 self.sock.send(key.encode('utf-8'))
                 self.account_success()
             else:
@@ -164,13 +171,17 @@ class app:
             self.sock.connect((self.HOST, self.PORT))
 
             self.sock.send(self.user.encode('utf-8'))
+           
             null = (self.sock.recv(1024)).decode('utf-8')
             self.sock.send(self.password.encode('utf-8'))
             cnn = (self.sock.recv(1024)).decode('utf-8')
-            
+         
+         
             if cnn == "Accepted":
+               
                 self.page_messages(self.user)
             else:
+                self.sock.send("exit".encode('utf-8'))
                 self.home_alerte.configure(state=tkinter.NORMAL)
                 self.home_alerte.insert(tkinter.INSERT,"Password or user incorrect !")
                 self.home_alerte.configure(state=tkinter.DISABLED)
@@ -178,9 +189,16 @@ class app:
 
 
     def page_messages(self, user):
+        self.users_keys = {}
         self.sock.send(" ".encode('utf-8'))
         self.contacts_recv= (self.sock.recv(1024)).decode('utf-8')
+        self.sock.send(" ".encode('utf-8'))
+        self.keys_recv= (self.sock.recv(100000)).decode('utf-8')
         self.contacts = self.contacts_recv.split()
+        self.keys_recv = self.keys_recv.split()
+        
+        for i in range(len(self.contacts)):
+            self.users_keys[self.contacts[i]] = self.keys_recv[i]
         self.contacts.remove(self.user)
  
 
@@ -240,19 +258,17 @@ class app:
         idk = sender.curselection()
         self.value = sender.get(idk)
         conversation = f"new-conv-{self.user}_{self.value}"
-        
+        print(conversation)
         self.sock.send(conversation.encode('utf-8'))
 
 
     def send(self):
         self.message = self.message_input.get("0.0",'end-1c')
-     
+        print(self.message)
         if self.message != "" and self.message != "Ecrire un message...":
-           
-            message_to_send = encrypt(self.message,self.user,self.value)
+            message_to_send = encrypt(self.message,self.users_keys[self.user],self.users_keys[self.value])
             message_to_send[0] = str(message_to_send[0])
             messenge_to_send = " ".join(message_to_send)
-          
 
             message_ = f"{self.user}: {self.message}"
             self.sock.send(messenge_to_send.encode('utf-8'))
@@ -306,8 +322,10 @@ class app:
 
 
 
+    
 
  
 root = customtkinter.CTk()
 app(root)
+
 root.mainloop()
