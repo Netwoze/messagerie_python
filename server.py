@@ -1,17 +1,18 @@
 import socket
 import threading
+import logging
 from bdd import *
 import sys
 from datePY import *
 from security import *
 import re
 import time
-HOST = '0.0.0.0' #IP DU SERVEUR
+HOST = '0.0.0.0' #IP DU SERVEUR 
 PORT = 9090
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((HOST, PORT))
 server.listen()
-
+logging.basicConfig(filename=fr'C:\Users\alexa\OneDrive\Documents\Python\modif\V10.1 - a upload\logs.txt', filemode='a', format='%(asctime)s - %(message)s', datefmt='%d-%m-%Y %H:%M:%S', level=logging.INFO)
 clients = {}
 
 def broadcast(message,user):
@@ -34,7 +35,7 @@ def handle(client,username, user2,):
             print("Wait message")
             message = client.recv(1024).decode('utf-8')
             res = re.search(motif, message)
-            print(res, message)
+            
             if res == None:
                 message_to_send = message.split()
                 #if message_to_send:
@@ -69,26 +70,27 @@ def handle(client,username, user2,):
             client.close()
             break
 
-def receive_new_user(client):
+def receive_new_user(client, address):
     try:
         username = client.recv(1024).decode("utf-8")
-        
         client.send(" ".encode("utf-8"))
         password = client.recv(1024).decode("utf-8")
-       
         ### verification dans la base de donnée de user + password
         res = req_bdd(username,password,"connect_user")
-        
         res = list(res)
-        
         print(res[0])
         if res[0] == "Accepted":
+            logging.info(f'User {username} logged - {address[0]}:{address[1]}')
             client.send("Accepted".encode("utf-8"))
             null = (client.recv(1024)).decode('utf-8')
             tab_users = req_bdd("all_users")
             tab_users = list(tab_users)[0]
+            tab_keys = req_bdd("all_users_keys")
+            tab_keys = list(tab_keys)[0]
         
             client.send(tab_users.encode("utf-8"))
+            null = (client.recv(1024)).decode('utf-8')
+            client.send(tab_keys.encode("utf-8"))
             clients[username] = client
 
             print(f"username of the is {username}")
@@ -103,73 +105,33 @@ def receive_new_user(client):
             thread.start()
         
         elif res[0] == None:
+            print("create user srv 1")
             client.send("nop".encode("utf-8"))
-            key= (client.recv(2048)).decode('utf-8')
-            print(key)
-
-            req = req_bdd(username, password, key, "create_user")
-            req = list(req)
-    except ValueError:
-        pass
-#receive
-def receive():
-    while True:
-        try:
-            client, address = server.accept()
-            print(f"Connected with {str(address)}!")
-            username = client.recv(1024).decode("utf-8")
-            client.send(" ".encode("utf-8"))
-            password = client.recv(1024).decode("utf-8")
-            ### verification dans la base de donnée de user + password
-            res = req_bdd(username,password,"connect_user")
-            res = list(res)
-            print(res[0])
-            if res[0] == "Accepted":
-                client.send("Accepted".encode("utf-8"))
-                null = (client.recv(1024)).decode('utf-8')
-                tab_users = req_bdd("all_users")
-                tab_users = list(tab_users)[0]
+            ans = (client.recv(2048)).decode('utf-8')
+            print("ans= ",ans)
+            if ans == "new_user":
+                client.send(" ".encode("utf-8"))
+                key= (client.recv(2048)).decode('utf-8')
             
-                client.send(tab_users.encode("utf-8"))
-                clients[username] = client
-    
-                print(f"username of the is {username}")
-                conversation = (client.recv(1024)).decode('utf-8')
-                #print(conversation)
-
-                user2 = conversation[conversation.index("_")+1:]
-                #print(username, user2,conversation)
-                messages_start(username, user2)
+                req = req_bdd(username, password, key, "create_user")
                 
-                thread = threading.Thread(target=handle, args=(client,username,user2,))
-                thread.start()
-            
-            elif res[0] == None:
-               
-                client.send("nop".encode("utf-8"))
+                req = list(req)
+            else:
+                logging.info(f'Fail connection : User {username} - {address[0]}:{address[1]}')
 
 
-        except:
-            pass
-          
-
+    except:
+        pass
+      
 def receive_client():
     while True:
         try:
             client, address = server.accept()
             print(f"Connected with {str(address)}!")
-            thread = threading.Thread(target=receive_new_user, args=(client,))
+            thread = threading.Thread(target=receive_new_user, args=(client,address))
             thread.start()
         except:
             pass
         
-
 print("Server running... ")
-
-
 receive_client()
-
-
-
-
-

@@ -1,5 +1,6 @@
 import base64
-from .datePY import *
+#from bdd import *
+from datePY import *
 from Crypto.Cipher import AES, PKCS1_OAEP
 from Crypto import Random
 from Crypto.PublicKey import RSA
@@ -10,17 +11,15 @@ from hashlib import sha512
 
 def create_key(name):
     username_windows = os.environ.get( "USERNAME" )
-    directory = rf'C:\Users\{username_windows}\.python_project_priv_key'
+    directory = rf'C:\Users\{username_windows}\MESSAGERIE_PYTHON\privates_keys'
     key = RSA.generate(1024)
     pub_key = key.publickey().export_key("PEM")
     priv_key = key.exportKey("PEM")
     #key_decode = pub_key.decode('utf-8')
     if not os.path.exists(directory):
         os.makedirs(directory)
-    with open(rf'{directory}\private_{name}.pem','wb') as k:
+    with open(rf'{directory}\private_key_{name}.pem','wb') as k:
         k.write(priv_key)
-    """with open(f'pub_{name}.pem','wb') as k:
-        k.write(pub_key)"""
     return encode_base64(pub_key)
 
 
@@ -37,7 +36,7 @@ def decode_base64(encoded_data):
 
 def decrypt(message,user):
     username_windows = os.environ.get( "USERNAME" )
-    with open(rf'C:\Users\{username_windows}\.python_project_priv_key\private_{user}.pem','rb') as p:
+    with open(rf'C:\Users\{username_windows}\MESSAGERIE_PYTHON\privates_keys\private_key_{user}.pem','rb') as p:
         priv = p.read()
     private_key = RSA.importKey(priv)
     private_key = PKCS1_OAEP.new(private_key)
@@ -45,9 +44,7 @@ def decrypt(message,user):
     decrypted_text = private_key.decrypt(message)
     return decrypted_text.decode("utf-8")
 
-
-
-def encrypt(message, key_usera, key_userb):
+def encrypt(message,usera,userb, key_usera, key_userb):
     message = message.encode()
     tab_key = []
     tab_to_send = []
@@ -58,6 +55,7 @@ def encrypt(message, key_usera, key_userb):
     key_userb = decode_base64(key_userb)
     tab_key.append(key_usera)#requete à la base de donnée pour réccupérer les clés publiques de user1 et user 2
     tab_key.append(key_userb)
+
    
     for elem in tab_key:
         pub_key = RSA.importKey(elem)
@@ -71,5 +69,7 @@ def encrypt(message, key_usera, key_userb):
 
 def hash_password(password):
     return sha512(password.encode()).hexdigest()
+
+
 
 

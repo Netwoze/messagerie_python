@@ -1,11 +1,5 @@
 import mysql.connector
-import os
-"""connection_params = {
-    'host': "localhost",
-    'user': os.environ.get('USER_MESSAGERIE_PYTHON'),
-    'password': os.environ.get('PASSWORD_MESSAGERIE_PYTHON'),
-    'database': "MESSAGERIE_PYTHON",
-}"""
+
 connection_params = {
     'host': "localhost",
     'user': "root",
@@ -19,7 +13,7 @@ def req_bdd(*values):
             def create_user(user, password, keys):
                 request = f"insert into comptes (usernames,password_users,public_keys) values ('{user}','{password}', '{keys}')"
                 c.execute(request)
-                return "Ok"
+                return "user created bdd"
 
             def connect_user(user,password):
                 c.execute(f"SELECT * FROM comptes WHERE usernames = '{user}' AND password_users = '{password}'")
@@ -29,7 +23,7 @@ def req_bdd(*values):
                 else:
                     return "Accepted"
 
-            #create_user("test", "pass")
+
             def verif_name():
                 request = f"SELECT * FROM comptes WHERE usernames = 'test'"
                 c.execute(request)
@@ -60,6 +54,7 @@ def req_bdd(*values):
                 else:
                     return 
 
+            
             def all_users():
                 request = f"SELECT usernames FROM comptes"
                 c.execute(request)
@@ -67,6 +62,15 @@ def req_bdd(*values):
                 res = c.fetchall()
                 for elem in res:
                     tab_users.append(elem[0])
+                return " ".join(tab_users)
+            
+            def all_users_keys():
+                request = f"SELECT usernames,public_keys  FROM comptes"
+                c.execute(request)
+                tab_users = []
+                res = c.fetchall()
+                for elem in res:
+                    tab_users.append(elem[1])
                 return " ".join(tab_users)
 
             def save_message(name_a, name_b, message, ts, nb):
@@ -81,9 +85,7 @@ def req_bdd(*values):
                 request = f"SELECT public_keys FROM comptes WHERE usernames = '{user}'"
                 c.execute(request)
                 return c.fetchone()[0]
-
-
-
+                
 
             if values[-1] == "connect_user":
                  yield connect_user(values[0],values[1])
@@ -105,4 +107,12 @@ def req_bdd(*values):
             elif values[-1] == "create_user":
                 yield create_user(values[0],values[1],values[2])
 
+            elif values[-1] == "all_users_keys":
+                yield all_users_keys()
 
+            """elif values[-1] == "eee":
+                print("oui")
+                eee()"""
+key = "5b722b307fce6c944905d132691d5e4a2214b7fe92b738920eb3fce3a90420a19511c3010a0e7712b054daef5b57bad59ecbd93b3280f210578f547f4aed4d25"
+res = req_bdd("all_users_keys")
+res = list(res)
