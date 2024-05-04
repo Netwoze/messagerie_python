@@ -1,12 +1,9 @@
 import mysql.connector
 
 connection_params = {
-"""
-Paramètres de connexion à la base de données
-"""
     'host': "",
-    'user': "",
-    'password': "",
+    'user': os.environ.get(''), #variable environnement
+    'password': os.environ.get(''), #variable environnement
     'database': "",
 }
 def req_bdd(*values):
