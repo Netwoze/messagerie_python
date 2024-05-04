@@ -1,5 +1,5 @@
 import mysql.connector
-
+import os
 connection_params = {
     'host': "",
     'user': os.environ.get(''), #variable environnement
