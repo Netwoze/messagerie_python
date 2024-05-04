@@ -1,4 +1,11 @@
 # messagerie_python
+
+### Informations
+1. La messagerie est conçue pour fonctionner sur un client windows
+2. Les clés privées sont enregistrées en local dans le répertoire
+    - C:\Users\%USERNAME%\MESSAGERIE_PYTHON\
+    Pour modifier le repertoire pour l'adapter à un client linux pour des besoins personnels, se rendre dans le fichier security.py au ligne 13 et 37
+
 ### 1 - Architecture du projet 
 
 ![architecture](https://github.com/Netwoze/messagerie_python/assets/93689421/e9bf6200-535a-43f3-b7aa-72374fa20f68)
