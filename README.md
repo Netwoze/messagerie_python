@@ -16,6 +16,8 @@
    - date.PY
    - security.py
 
+3. La base de données bdd_messagerie.sql doit être importée dans un serveur de base de données
+
 ### 3 - Installation des modules
 1. Fichier requirements
   ```
