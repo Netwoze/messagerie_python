@@ -1,9 +1,6 @@
 import mysql.connector
 
 connection_params = {
-"""
-Paramètres de connexion à la base de données
-"""
     'host': "",
     'user': "",
     'password': "",
