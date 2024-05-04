@@ -105,10 +105,9 @@ def receive_new_user(client, address):
             thread.start()
         
         elif res[0] == None:
-            print("create user srv 1")
+            print("create user")
             client.send("nop".encode("utf-8"))
             ans = (client.recv(2048)).decode('utf-8')
-            print("ans= ",ans)
             if ans == "new_user":
                 client.send(" ".encode("utf-8"))
                 key= (client.recv(2048)).decode('utf-8')

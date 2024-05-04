@@ -16,7 +16,7 @@ class app:
 
         self.master = master
         self.master.geometry("1200x600")
-        self.HOST = 'messagerie-python.ydns.eu'
+        self.HOST = '127.0.0.1'
         self.PORT = 9090
 
         self.login()
@@ -87,17 +87,20 @@ class app:
         self.acct_alerte.configure(state=tkinter.DISABLED)
         self.loginuser = self.login_user.get().strip()
         self.password1 = self.password_1.get().strip()
-        print(self.loginuser, f"pass:{self.password1}-")
         
         self.password2 = self.password_2.get().strip()
         
-        print(self.loginuser, f"{self.password1}")
+        print(f"username:{self.loginuser}-password:{self.password1}")
         if self.loginuser == "" or self.password1 == "" or self.password2 == "":
+            """
+            Verification des champs
+            """
             self.acct_alerte.configure(state=tkinter.NORMAL)
             self.acct_alerte.insert(tkinter.INSERT,"Password or user empty !")
             self.acct_alerte.configure(state=tkinter.DISABLED)
             self.password_1.delete(0, END) 
             self.password_2.delete(0, END)
+
         elif self.password1 != self.password2:
             self.acct_alerte.configure(state=tkinter.NORMAL)
             self.acct_alerte.insert(tkinter.INSERT,"Passwords are different ! ")
@@ -118,6 +121,9 @@ class app:
             if cnn == "nop":
                 key = create_key(self.loginuser)
                 print(key)
+                self.new_user = "new_user"
+                self.sock.send(self.new_user.encode('utf-8'))
+                null = (self.sock.recv(1024)).decode('utf-8')
                 self.sock.send(key.encode('utf-8'))
                 self.account_success()
             else:
@@ -127,6 +133,9 @@ class app:
                 self.sock.close()
 
     def account_success(self):
+        """
+        Page d'affichage si le compte est créé avec succès
+        """
         for i in self.master.winfo_children():
             i.destroy()
         self.home_success = customtkinter.CTkFrame(self.master, width=500, height=250)
@@ -145,6 +154,9 @@ class app:
         self.connection()
 
     def connection(self):
+        """
+        Page de connexion
+        """
         self.home_alerte.configure(state=tkinter.NORMAL)
         self.home_alerte.delete(0,tkinter.END)
         self.home_alerte.configure(state=tkinter.DISABLED)
@@ -181,6 +193,9 @@ class app:
   
 
     def page_messages(self, user):
+        """
+        Page des messages et des contacts
+        """
         self.users_keys = {}
         
         self.sock.send(" ".encode('utf-8'))

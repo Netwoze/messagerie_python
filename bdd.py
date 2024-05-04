@@ -65,7 +65,7 @@ def req_bdd(*values):
                 return " ".join(tab_users)
             
             def all_users_keys():
-                request = f"SELECT usernames,public_keys  FROM comptes"
+                request = f"SELECT usernames,public_keys FROM comptes"
                 c.execute(request)
                 tab_users = []
                 res = c.fetchall()
@@ -74,7 +74,9 @@ def req_bdd(*values):
                 return " ".join(tab_users)
 
             def save_message(name_a, name_b, message, ts, nb):
-                #name_a, name_b, message, ts
+                """
+                Enregistrer message dans la base de données
+                """
                 conv = f"{str(name_a)}_{str(name_b)}_{str(nb)}"
                 request = f"insert into messages (conversations,messages,date_heure) values ('{conv}','{message}', '{ts}')"
                 #print(f"req: {request}")
@@ -82,11 +84,16 @@ def req_bdd(*values):
 
 
             def get_key(user):
+                """
+                Récuppérer clé publique d'un utilisateur
+                """
                 request = f"SELECT public_keys FROM comptes WHERE usernames = '{user}'"
                 c.execute(request)
                 return c.fetchone()[0]
                 
-
+            """
+            Récuppération du dernier argument de la fonction pour déterminer la requête à effectuer.
+            """
             if values[-1] == "connect_user":
                  yield connect_user(values[0],values[1])
 
@@ -109,10 +116,3 @@ def req_bdd(*values):
 
             elif values[-1] == "all_users_keys":
                 yield all_users_keys()
-
-            """elif values[-1] == "eee":
-                print("oui")
-                eee()"""
-key = "5b722b307fce6c944905d132691d5e4a2214b7fe92b738920eb3fce3a90420a19511c3010a0e7712b054daef5b57bad59ecbd93b3280f210578f547f4aed4d25"
-res = req_bdd("all_users_keys")
-res = list(res)
