@@ -1,5 +1,4 @@
 import base64
-#from bdd import *
 from datePY import *
 from Crypto.Cipher import AES, PKCS1_OAEP
 from Crypto import Random
@@ -15,7 +14,6 @@ def create_key(name):
     key = RSA.generate(1024)
     pub_key = key.publickey().export_key("PEM")
     priv_key = key.exportKey("PEM")
-    #key_decode = pub_key.decode('utf-8')
     if not os.path.exists(directory):
         os.makedirs(directory)
     with open(rf'{directory}\private_key_{name}.pem','wb') as k:

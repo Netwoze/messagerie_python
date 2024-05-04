@@ -3,7 +3,7 @@ import tkinter.messagebox
 import customtkinter
 import socket
 import threading
-from security import *
+from security import hash_password, encrypt, decrypt, create_key, timestamp_to_readable
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
 
@@ -16,8 +16,8 @@ class app:
 
         self.master = master
         self.master.geometry("1200x600")
-        self.HOST = '127.0.0.1'
-        self.PORT = 9090
+        self.HOST = '0.0.0.0' #IP du serveur
+        self.PORT = 9090 #port applicatif
 
         self.login()
  

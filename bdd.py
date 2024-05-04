@@ -1,10 +1,13 @@
 import mysql.connector
 
 connection_params = {
-    'host': "localhost",
-    'user': "root",
-    'password': "root",
-    'database': "bdd_messagerie",
+"""
+Paramètres de connexion à la base de données
+"""
+    'host': "",
+    'user': "",
+    'password': "",
+    'database': "",
 }
 def req_bdd(*values):
     with mysql.connector.connect(**connection_params) as db :

@@ -7,8 +7,8 @@ from datePY import *
 from security import *
 import re
 import time
-HOST = '0.0.0.0' #IP DU SERVEUR 
-PORT = 9090
+HOST = '0.0.0.0'
+PORT = 9090 #port applicatif
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((HOST, PORT))
 server.listen()

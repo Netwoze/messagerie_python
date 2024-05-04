@@ -1,0 +1,15 @@
+socket
+threading
+logging
+sys
+re
+time
+base64
+os
+mysql
+pycryptodome
+mysql-connector-python
+mysqlclient
+tkinter
+tkinter.messagebox
+customtkinter
